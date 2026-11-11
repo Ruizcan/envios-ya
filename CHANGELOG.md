@@ -6,6 +6,13 @@ y el proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-11
+### Added
+- CR-01: nuevo tipo de cliente `empresarial` con 12 % de descuento.
+- CR-01: el cliente empresarial no paga recargo de zona cuando el peso es mayor que L2 (10 kg)
+  (nueva estrategia `SinRecargoZona`).
+- Pruebas CE-01 a CE-08 y prueba de zona inválida para el cliente empresarial.
+
 ## [2.0.0] - 2026-11-11
 ### Changed
 - **(Incompatible)** Se eliminó el argumento `flag` de `calc`; quien lo pasaba ahora recibe `TypeError`.
@@ -34,7 +41,8 @@ y el proyecto sigue [Versionado Semántico](https://semver.org/lang/es/).
 ### Added
 - Código heredado de EnvíaYa con `CONFIG` diligenciado según el código estudiantil 0182210085.
 
-[Unreleased]: ../../compare/v2.0.0...HEAD
+[Unreleased]: ../../compare/v2.1.0...HEAD
+[2.1.0]: ../../compare/v2.0.0...v2.1.0
 [2.0.0]: ../../compare/v1.0.1...v2.0.0
 [1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0
