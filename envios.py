@@ -1,4 +1,4 @@
-"""envios.py - Cálculo del costo de un envío de EnvíaYa (versión 2.0.0).
+"""envios.py - Cálculo del costo de un envío de EnvíaYa (versión 2.1.0).
 
 Especificación personalizada: Audi Javier Ruiz Cantillo, código 0182210085
 (A=2 B=1 C=0 D=0 E=8 F=5).
@@ -27,6 +27,7 @@ DESCUENTOS_CLIENTE = {                  # R6: V = 10 + 5*(A mod 3) %
     "normal": Decimal("0"),
     "frecuente": Decimal("0.05"),
     "vip": Decimal("0.20"),
+    "empresarial": Decimal("0.12"),     # CR-01
 }
 CUPONES = {"ENVIO10": Decimal("0.10")}  # R6/R7
 
@@ -58,6 +59,13 @@ class ZonaRural(EstrategiaZona):
 class ZonaNacional(EstrategiaZona):
     def aplicar_recargo(self, tarifa: Decimal) -> Decimal:
         return tarifa * (1 + RECARGO_NACIONAL)
+
+
+class SinRecargoZona(EstrategiaZona):
+    """CR-01: cliente empresarial con peso mayor que L2 no paga recargo de zona."""
+
+    def aplicar_recargo(self, tarifa: Decimal) -> Decimal:
+        return tarifa
 
 
 ESTRATEGIAS_ZONA = {
@@ -102,6 +110,11 @@ def calcular_tarifa_base(peso: Decimal) -> Decimal:
     return TARIFA_TRAMO_2 + (peso - LIMITE_TRAMO_2_KG) * TARIFA_POR_KG_EXTRA
 
 
+def exento_de_recargo_zona(cliente: str, peso: Decimal) -> bool:
+    """CR-01: el cliente empresarial no paga recargo de zona si peso > L2."""
+    return cliente == "empresarial" and peso > LIMITE_TRAMO_2_KG
+
+
 def es_fin_de_semana(dia: int) -> bool:
     return dia in DIAS_FIN_DE_SEMANA
 
@@ -125,6 +138,8 @@ def calcular_costo(peso, zona, cliente, dia, cupon=None) -> int:
     estrategia_zona = obtener_estrategia_zona(zona)
     validar_dia(dia)
     descuento_cupon = obtener_descuento_cupon(cupon)
+    if exento_de_recargo_zona(cliente, peso):
+        estrategia_zona = SinRecargoZona()
 
     costo = estrategia_zona.aplicar_recargo(calcular_tarifa_base(peso))
     if es_fin_de_semana(dia):                     # E par: antes de los descuentos
